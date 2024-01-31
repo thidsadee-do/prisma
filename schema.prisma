@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMERS
+  STYLIST
+}
+
+model Customers {
+  ctm_id           Int                @id @default(autoincrement())
+  ctm_username     String
+  ctm_email        String
+  ctm_password     String
+  ctm_sex          String
+  ctm_phone        String
+  Appointment      Appointment[]
+  LoginCredentials LoginCredentials[]
+  UserBooking      UserBooking[]
+  Register         Register[]
+}
+
+model BarberShop {
+  bs_id            Int    @id @default(autoincrement())
+  bs_shopname      String
+  bs_shopaddress   String
+  bs_contactnumber String
+  Appointment Appointment[]
+  UserBooking UserBooking[]
+}
+
+model Appointment {
+  apm_id          Int           @id @default(autoincrement())
+  CustomerId      Customers     @relation(fields: [customersCtm_id], references: [ctm_id])
+  apm_shop        BarberShop    @relation(fields: [barberShopBs_id], references: [bs_id])
+  barberShopBs_id Int
+  customersCtm_id Int
+  apm_datetime    DateTime
+  apm_service     String
+  UserBooking     UserBooking[]
+}
+
+model LoginCredentials {
+  log_id          Int       @id @default(autoincrement())
+  CustomerId      Customers @relation(fields: [customersCtm_id], references: [ctm_id])
+  log_username    String
+  log_password    String
+  customersCtm_id Int
+}
+
+model UserBooking {
+  ubk_id            Int         @id @default(autoincrement())
+  CustomerId        Customers   @relation(fields: [customersCtm_id], references: [ctm_id])
+  customersCtm_id   Int
+  ShopId            BarberShop  @relation(fields: [barberShopBs_id], references: [bs_id])
+  barberShopBs_id   Int
+  AppointmentId     Appointment @relation(fields: [appointmentApm_id], references: [apm_id])
+  appointmentApm_id Int
+  ubk_status        String
+}
+
+model Admin {
+  am_id       Int    @id @default(autoincrement())
+  am_username String
+  am_password String
+}
+
+model Register {
+  rgt_id          Int       @id @default(autoincrement())
+  CustomerId      Customers @relation(fields: [customersCtm_id], references: [ctm_id])
+  customersCtm_id Int
+}
